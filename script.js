@@ -26,9 +26,7 @@ function timeAgo(ts){
 /* ------------------------
    App state
    ------------------------ */
-let state = {
-  comments: []
-};
+let state = { comments: [] };
 let likedSet = new Set(JSON.parse(localStorage.getItem(LIKED_KEY) || '[]'));
 
 /* ------------------------
@@ -43,11 +41,7 @@ const top1 = document.getElementById('top1');
 const top2 = document.getElementById('top2');
 const top3 = document.getElementById('top3');
 const clearStorageBtn = document.getElementById('clear-storage');
-
 const music = document.getElementById('christmas-music');
-const musicToggle = document.getElementById('music-toggle');
-const muteToggle = document.getElementById('mute-toggle');
-
 const toggleSnowBtn = document.getElementById('toggle-snow');
 const snowContainer = document.getElementById('snow-container');
 
@@ -59,15 +53,11 @@ function load() {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) state = JSON.parse(raw);
     if (!state.comments) state.comments = [];
-  } catch (e) {
-    state = {comments: []};
-  }
+  } catch (e) { state = {comments: []}; }
 }
 
 function save() {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  } catch(e) { /* ignore */ }
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e){}
   localStorage.setItem(LIKED_KEY, JSON.stringify(Array.from(likedSet)));
 }
 
@@ -75,17 +65,13 @@ function save() {
    Rendering
    ------------------------ */
 function renderComments() {
-  // sort by likes desc then time desc
   state.comments.sort((a,b) => b.likes - a.likes || b.timestamp - a.timestamp);
-
   commentsList.innerHTML = '';
   state.comments.forEach(comment => {
     const li = document.createElement('li');
     li.className = 'comment';
     li.dataset.id = comment.id;
-
     const likedAlready = likedSet.has(comment.id);
-
     li.innerHTML = `
       <div class="meta">
         <div>
@@ -105,206 +91,101 @@ function renderComments() {
     `;
     commentsList.appendChild(li);
   });
-
-  // update top 3 scoreboard
   top1.textContent = state.comments[0] ? truncate(state.comments[0].text, 60) : '';
   top2.textContent = state.comments[1] ? truncate(state.comments[1].text, 60) : '';
   top3.textContent = state.comments[2] ? truncate(state.comments[2].text, 60) : '';
 }
-
-function truncate(s, n=40){ if(!s) return ''; return s.length > n ? s.slice(0,n-3) + '...' : s }
+function truncate(s, n=40){ if(!s) return ''; return s.length > n ? s.slice(0,n-3)+'...' : s }
 
 /* ------------------------
    Comment actions
    ------------------------ */
-function addComment(name, text) {
-  const c = {
-    id: uid(),
-    name: name || 'Anonymous',
-    text: text || '',
-    likes: 0,
-    timestamp: now()
-  };
-  state.comments.push(c);
-  save();
-  renderComments();
+function addComment(name,text){
+  const c = {id:uid(), name:name||'Anonymous', text:text||'', likes:0, timestamp:now()};
+  state.comments.push(c); save(); renderComments();
 }
-
-function handleLike(commentId, btnEl) {
-  // one click per commenter per comment: stored in likedSet
-  if (likedSet.has(commentId)) return; // ignore further clicks
-  const comment = state.comments.find(c => c.id === commentId);
-  if (!comment) return;
-  comment.likes++;
-  likedSet.add(commentId);
-  save();
-  renderComments();
+function handleLike(commentId){
+  if (likedSet.has(commentId)) return;
+  const c = state.comments.find(x=>x.id===commentId);
+  if (!c) return;
+  c.likes++; likedSet.add(commentId); save(); renderComments();
 }
 
 /* ------------------------
    Form events
    ------------------------ */
-wishForm.addEventListener('submit', e => {
+wishForm.addEventListener('submit', e=>{
   e.preventDefault();
   let name = nameInput.value.trim();
-  if (anonymousCheckbox.checked) name = 'Anonymous';
+  if (anonymousCheckbox.checked) name='Anonymous';
   const text = wishInput.value.trim();
-  if (!text) {
-    wishInput.focus();
-    return;
-  }
-  addComment(name || 'Anonymous', text);
-  wishForm.reset();
-  nameInput.focus();
+  if(!text){wishInput.focus(); return;}
+  addComment(name,text); wishForm.reset(); nameInput.focus();
 });
-
-/* delegated like click */
-commentsList.addEventListener('click', (e) => {
+commentsList.addEventListener('click', e=>{
   const btn = e.target.closest('.like-btn');
-  if (!btn) return;
-  const id = btn.dataset.id;
-  handleLike(id, btn);
+  if(!btn) return;
+  handleLike(btn.dataset.id);
 });
-
-/* clear storage */
-clearStorageBtn.addEventListener('click', () => {
-  if (!confirm('Clear all saved wishes and likes (local only)?')) return;
+clearStorageBtn.addEventListener('click', ()=>{
+  if(!confirm('Clear all saved wishes and likes (local only)?')) return;
   localStorage.removeItem(STORAGE_KEY);
   localStorage.removeItem(LIKED_KEY);
-  state.comments = [];
-  likedSet.clear();
-  renderComments();
+  state.comments=[]; likedSet.clear(); renderComments();
 });
 
 /* ------------------------
-   Seed sample comments (only if none)
+   Seed sample comments
    ------------------------ */
-function seed() {
-  if (state.comments.length === 0) {
-    state.comments.push({
-      id: uid(), name: 'Marina',
-      text: 'Merry Christmas! May God shower your life with unlimited blessings on this day.',
-      likes: 209, timestamp: now() - 1000*60*20
-    });
-    state.comments.push({
-      id: uid(), name: 'Bryan',
-      text: 'Merry Xmas! Warmest greetings to you on this festive season and best wishes for the New Year.',
-      likes: 90, timestamp: now() - 1000*60*50
-    });
+function seed(){
+  if(state.comments.length===0){
+    state.comments.push({id:uid(),name:'Marina',text:'Merry Christmas! May God shower your life with unlimited blessings on this day.',likes:209,timestamp:now()-1000*60*20});
+    state.comments.push({id:uid(),name:'Bryan',text:'Merry Xmas! Warmest greetings to you on this festive season and best wishes for the New Year.',likes:90,timestamp:now()-1000*60*50});
     save();
   }
 }
 
 /* ------------------------
-   Music controls & autoplay fallback
+   Music setup
    ------------------------ */
-function setupMusic() {
-  // attempt autoplay
-  music.play().then(() => {
-    musicToggle.textContent = 'Pause music';
-  }).catch(() => {
-    musicToggle.textContent = 'Play music';
+function setupMusic(){
+  music.play().catch(()=>{
+    const startMusic = ()=>{ music.play().catch(()=>{}); };
+    window.addEventListener('click', startMusic, {once:true});
+    window.addEventListener('touchstart', startMusic, {once:true});
   });
-
-  musicToggle.addEventListener('click', () => {
-    if (music.paused) {
-      music.play().then(()=> musicToggle.textContent = 'Pause music').catch(()=> musicToggle.textContent = 'Play music');
-    } else {
-      music.pause();
-      musicToggle.textContent = 'Play music';
-    }
-  });
-
-  muteToggle.addEventListener('click', (ev) => {
-    ev.preventDefault();
-    music.muted = !music.muted;
-    muteToggle.textContent = music.muted ? 'Unmute' : 'Mute';
-  });
-
-  // if user interacts anywhere first time, try to play (fallback)
-  const playOnInteraction = () => {
-    music.play().catch(()=>{});
-    window.removeEventListener('click', playOnInteraction);
-    window.removeEventListener('keydown', playOnInteraction);
-  };
-  window.addEventListener('click', playOnInteraction);
-  window.addEventListener('keydown', playOnInteraction);
 }
 
 /* ------------------------
-   Snow animation (canvas-less small DOM elements)
+   Snow animation
    ------------------------ */
-let snowInterval = null;
-let snowOn = true;
-
+let snowInterval=null, snowOn=true;
 function createSnowflake(){
-  const el = document.createElement('div');
-  el.className = 'snowflake';
-  el.style.position = 'absolute';
-  el.style.top = '-10vh';
-  el.style.left = (Math.random()*100) + 'vw';
-  const size = 8 + Math.random()*28;
-  el.style.fontSize = size + 'px';
-  el.style.pointerEvents = 'none';
-  el.textContent = '❄️';
-  el.style.opacity = (0.2 + Math.random()*0.9).toString();
-  const duration = 6 + Math.random()*12; // seconds
-
+  const el=document.createElement('div');
+  el.className='snowflake';
+  el.style.position='absolute';
+  el.style.top='-10vh';
+  el.style.left=(Math.random()*100)+'vw';
+  const size=8+Math.random()*28; el.style.fontSize=size+'px';
+  el.style.pointerEvents='none'; el.textContent='❄️';
+  el.style.opacity=(0.2+Math.random()*0.9).toString();
+  const duration=6+Math.random()*12;
   snowContainer.appendChild(el);
-
-  // animate using CSS transforms with transition
-  const endX = (Math.random()*40 - 20); // drift
-  el.animate([
-    { transform: `translate3d(0,0,0)` },
-    { transform: `translate3d(${endX}vw, ${100 + Math.random()*20}vh, 0)` }
-  ], {
-    duration: duration*1000,
-    easing: 'linear',
-    iterations: 1,
-    fill: 'forwards'
-  });
-
-  setTimeout(()=> {
-    el.remove();
-  }, duration*1000 + 200);
+  const endX=(Math.random()*40-20);
+  el.animate([{transform:'translate3d(0,0,0)'},{transform:`translate3d(${endX}vw,${100+Math.random()*20}vh,0)`}],{duration:duration*1000,easing:'linear',iterations:1,fill:'forwards'});
+  setTimeout(()=>el.remove(),duration*1000+200);
 }
-
-function startSnow() {
-  if (snowInterval) return;
-  snowInterval = setInterval(createSnowflake, 150);
-  snowOn = true;
-  toggleSnowBtn.textContent = 'Toggle Snow';
-}
-function stopSnow() {
-  clearInterval(snowInterval);
-  snowInterval = null;
-  snowOn = false;
-  toggleSnowBtn.textContent = 'Snow off';
-}
-
-toggleSnowBtn.addEventListener('click', () => {
-  if (snowOn) stopSnow(); else startSnow();
-});
+function startSnow(){if(snowInterval)return;snowInterval=setInterval(createSnowflake,150);snowOn=true;toggleSnowBtn.textContent='Toggle Snow';}
+function stopSnow(){clearInterval(snowInterval);snowInterval=null;snowOn=false;toggleSnowBtn.textContent='Snow off';}
+toggleSnowBtn.addEventListener('click',()=>{if(snowOn) stopSnow(); else startSnow();});
 
 /* ------------------------
-   Initial boot
+   Boot
    ------------------------ */
-function boot() {
-  load();
-  seed();
-  renderComments();
-  setupMusic();
-  startSnow();
-}
-boot();
+function boot(){load(); seed(); renderComments(); setupMusic(); startSnow();}
+window.addEventListener('DOMContentLoaded', boot);
 
 /* ------------------------
-   accessibility: update timestamps every minute
+   Update timestamps every minute
    ------------------------ */
-setInterval(() => {
-  const times = document.querySelectorAll('.time, .time-small');
-  times.forEach(el => {
-    // don't change inner structure; easiest is re-render
-  });
-  renderComments();
-}, 60000);
+setInterval(()=>{ renderComments(); }, 60000);
