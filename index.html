@@ -57,7 +57,7 @@
           <button type="button" id="clear-storage" class="btn">Clear saved</button>
         </div>
 
-        <small class="hint">One like per user per wish. Likes & comments persist locally in your browser.</small>
+        
       </form>
 
       <aside class="live-comments" aria-live="polite" aria-label="Live comments">
@@ -68,14 +68,12 @@
   </main>
 
   <!-- floating audio controls -->
-  <div class="music-row" aria-hidden="false">
-    <audio id="christmas-music" preload="auto" loop>
-      <source src="https://cdn.pixabay.com/download/audio/2022/12/18/audio_e39915e463.mp3?filename=christmas-decorations-relax-120039.mp3" type="audio/mpeg">
-      Your browser does not support the audio element.
-    </audio>
-    <button id="music-toggle" class="btn small" title="Play / Pause music">Play music</button>
-    <a href="#" id="mute-toggle" class="btn small">Mute</a>
-  </div>
+ <!-- Only the audio element is needed -->
+<audio id="christmas-music" preload="auto" loop>
+  <source src="music/christmas.mp3" type="audio/mpeg">
+</audio>
+
+  
 
   <!-- snow canvas container -->
   <div id="snow-container" aria-hidden="true"></div>
