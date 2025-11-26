@@ -25,7 +25,7 @@ html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, "Seg
 .cal-text{font-weight:700;color:#8b1d1d}
 
 /* Title */
-.site-title{margin:0;font-size:20px;letter-spacing:3px;color:#08334a;font-weight:900}
+.site-title{margin:0;font-size:52px;letter-spacing:3px;color:#08334a;font-weight:900}
 
 /* top-controls */
 .top-controls{display:flex;gap:8px;align-items:center}
