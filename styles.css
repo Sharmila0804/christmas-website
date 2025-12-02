@@ -41,13 +41,13 @@ html,body{
 
 /* Calendar / Logo */
 .calendar{display:flex;align-items:center;gap:8px;}
-.calendar img{width:180px;height:180px;object-fit:contain;border-radius:8px;}
+.calendar img{width:350px;height:350px;object-fit:contain;border-radius:8px;}
 
 /* Site Title */
 .site-title{
-  width:1200px;
-  height:470px;
-  background-image:url('images/xmas logo.webp');
+  width:1600px;
+  height:490px;
+  background-image:url('images/xmas\ logo.png');
   background-size:cover;
   background-repeat:no-repeat;
   text-indent:-9999px;
@@ -75,9 +75,9 @@ html,body{
 .scoreboard{
   display:flex;
   flex-direction:column;
-  gap:50px;
+  gap:60px;
   position:relative;
-  margin-left: -450px;
+  margin-left: -580px;
   bottom: -150px;
   width: 600px;
   font-style:italic;
@@ -114,9 +114,11 @@ html,body{
   padding:18px;
   border-radius:14px;
   box-shadow:0 8px 24px rgba(0,0,0,0.06);
-  width:100%;
-  height: 460px;
-  margin-left: 450px;
+  min-width: 100%;
+  max-width: 100%; 
+  height: 490px;
+  margin-left: 290px;
+  margin-top: 200px;
   font-weight: 900;
   font-size: 16px;
   font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
@@ -162,13 +164,14 @@ html,body{
 
 /* Buttons */
 .btn {
-  padding: 10px 20px;
+  padding: 15px 57px;
   border-radius: 10px;
   font-weight: 700;
   font-size: 16px;
   cursor: pointer;
   border: none;
   transition: 0.25s ease;
+  margin-top: 20px;
 }
 
 .btn.primary {
@@ -223,10 +226,10 @@ html,body{
 /* Christmas Tree */
 .christmas-tree {
   position: absolute;
-  top: 130px;
+  top: 150px;
   right: -70px;
   width: 390px;
-  height: 190px;
+  height: 250px;
   z-index: 8;
 }
 
@@ -292,11 +295,12 @@ html,body{
   border-radius:14px;
   box-shadow:0 8px 28px rgba(0,0,0,0.06);
   overflow:auto;
-  min-height:450px;
-  max-height:500px;
+  min-height:600px;
+  max-height:600px;
   width:800px !important; 
+  min-width: 100%;
   max-width: 100%;
-  margin-left: 450px;
+ margin-left: 290px;
   background: rgba(254, 254, 254, 0.845);
   box-shadow: 0 12px 24px rgb(0, 0, 0);
 }
